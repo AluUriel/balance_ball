@@ -1,34 +1,33 @@
 #include <Arduino.h>
-#include <servo.h>
 
-Servo ESC;
-
-int vel = 1000; // Amplitud minima de pulso para tu ESC
-
-void setup()
-{
-
-  ESC.attach(9); // Pin en el que funciona
-
-  // Activar el ESC
-  ESC.writeMicroseconds(1000); // 1000 = 1ms
-  // Cambia el 1000 anterior por 2000 si
-  // tu ESC se activa con un pulso de 2ms
-  delay(5000); // Esperar 5 segundos para hacer la activacion
-
+void setup() {
+  // Comunicación seria a 9600 baudios
   Serial.begin(9600);
-  Serial.setTimeout(10);
+  pinMode(13, OUTPUT);
 }
 
-void loop()
+
+void loop() {
+  
+  long tiempo=millis(); //tiempo antes de iniciar la lectura
+  int D_cm=distancia(20); //lectura de distancia
+  tiempo=millis()-tiempo; //milisegundos que duró la lectura
+  Serial.print("Tiempo de lectura: ");
+  Serial.print(tiempo); 
+  Serial.print("ms  Distancia: ");
+  Serial.print(D_cm);
+  Serial.println("  cm");
+  delay(100);
+}
+
+float distancia(int n)
 {
-  if (Serial.available() >= 1)
+  long suma=0;
+  for(int i=0;i<n;i++)
   {
-    vel = Serial.parseInt(); // Leer un entero por serial
-    if (vel != 0)
-    {
-      ESC.writeMicroseconds(vel); // Generar un pulso con el numero recibido
-    }
-  }
+    suma=suma+analogRead(A0);
+  }  
+  float adc=suma/n;
+  float distancia_cm = 17569.7 * pow(adc, -1.2062);
+  return(distancia_cm);
 }
-
