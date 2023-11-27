@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <RunningAverage.h>
+#include "CommunicationHandler.h"
+#include "HardwareSerialAdapter.h"
 
 // Define los pines para el sensor HC-SR04
 const int triggerPin = 9;
@@ -17,11 +19,24 @@ const int analogPin = 36;
 #define SENSOR_TYPE "INFRARROJO"
 
 // Crea objetos RunningAverage
-RunningAverage raInfrarrojo(10); // Ajusta el tamaño según tus necesidades
-RunningAverage raUltrasonico(10);
+RunningAverage raInfrarrojo(100); // Ajusta el tamaño según tus necesidades
+RunningAverage raUltrasonico(100);
 
-float leerDistanciaInfrarrojo();
-float leerDistanciaUltrasonico();
+double leerDistanciaInfrarrojo();
+double leerDistanciaUltrasonico();
+
+HardwareSerialAdapter serialAdapter;
+CommunicationHandler serialHandler(serialAdapter);
+
+void onMessage(String payload) {
+  Serial.print("Mensaje recibido: ");
+  Serial.println(payload);
+}
+
+void onNumber(String payload) {
+  Serial.print("Número recibido: ");
+  Serial.println(payload);
+}
 
 void setup() {
   Serial.begin(115200);
@@ -33,6 +48,11 @@ void setup() {
 
   raInfrarrojo.clear(); // Inicializa el promedio móvil para infrarrojo
   raUltrasonico.clear(); // Inicializa el promedio móvil para ultrasonico
+
+  serialHandler.attachCallback("message", onMessage);
+  serialHandler.attachCallback("number", onNumber);
+
+  serialHandler.start();
 }
 
 void loop() {
@@ -44,21 +64,23 @@ void loop() {
     distancia = leerDistanciaInfrarrojo();
   }
 
-  Serial.print("0 ");
-  Serial.print("60 ");
-  Serial.println(distancia);
+  // Serial.print("0 ");
+  // Serial.print("60 ");
+  // Serial.println(distancia);
 
   delay(10); // Espera un tiempo para la siguiente medición
 }
 
-float leerDistanciaInfrarrojo() {
-  float adc = analogRead(analogPin);
-  float distancia_cm = 9462.7 * pow(adc, -1.115) + 3.297;
-  raInfrarrojo.addValue(constrain(distancia_cm, 5.0, 80.0));
+double leerDistanciaInfrarrojo() {
+  double adc = analogRead(analogPin);
+  double distance = 27898/adc;
+  raInfrarrojo.addValue(distance);
+  // float distancia_cm = 9462.7 * pow(adc, -1.115) + 3.297;
+  // raInfrarrojo.addValue(constrain(distancia_cm, 5.0, 80.0));
   return raInfrarrojo.getAverage();
 }
 
-float leerDistanciaUltrasonico() {
+double leerDistanciaUltrasonico() {
   digitalWrite(triggerPin, LOW);
   delayMicroseconds(2);
   digitalWrite(triggerPin, HIGH);
