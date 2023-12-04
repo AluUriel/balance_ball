@@ -19,8 +19,8 @@ const int analogPin = 36;
 #define SENSOR_TYPE "INFRARROJO"
 
 // Crea objetos RunningAverage
-RunningAverage raInfrarrojo(100); // Ajusta el tamaño según tus necesidades
-RunningAverage raUltrasonico(100);
+RunningAverage raInfrarrojo(10); // Ajusta el tamaño según tus necesidades
+RunningAverage raUltrasonico(10);
 
 double leerDistanciaInfrarrojo();
 double leerDistanciaUltrasonico();
@@ -56,7 +56,7 @@ void setup() {
 }
 
 void loop() {
-  float distancia;
+  double distancia;
 
   if (String(SENSOR_TYPE) == "ULTRASONICO") {
     distancia = leerDistanciaUltrasonico();
@@ -64,9 +64,9 @@ void loop() {
     distancia = leerDistanciaInfrarrojo();
   }
 
-  // Serial.print("0 ");
-  // Serial.print("60 ");
-  // Serial.println(distancia);
+  Serial.print("0 ");
+  Serial.print("45 ");
+  Serial.println(distancia);
 
   delay(10); // Espera un tiempo para la siguiente medición
 }
