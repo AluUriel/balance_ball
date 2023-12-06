@@ -6,6 +6,9 @@
 #include <vector>
 #include <ESP32Servo.h> // ESP32Servo library installed by Library Manager
 #include "ESC.h" // RC_ESP library installed by Library Manager
+#include "KalmanFilter.h"
+
+KalmanFilter kalmanFilter(0.0054, 0.1873);
 
 
 // Define the min and max output values for the ESC
@@ -63,6 +66,22 @@ void setSetpoint(String payload) {
 
     Serial.print("Setpoint: ");
     Serial.println(Setpoint);
+}
+
+void setKalmanGains(String payload) {
+    std::vector<String> gains = split(payload, ' ');
+
+    if (gains.size() == 2) {
+        kalmanFilter.setProcessNoise(gains[0].toFloat());
+        kalmanFilter.setMeasurementNoise(gains[1].toFloat());
+
+        Serial.print("Kalman process noise: ");
+        Serial.print(gains[0]);
+        Serial.print(" measurement noise: ");
+        Serial.println(gains[1]);
+    } else {
+        Serial.println("Error: no se proporcionaron suficientes ganancias");
+    }
 }
 
 std::vector<String> split(const String& str, char delimiter) {
@@ -127,6 +146,7 @@ void setup() {
         Serial.print("PID: ");
         Serial.println(pid_enabled);
     });
+    serialHandler.attachCallback("k", setKalmanGains);
 
 
 
@@ -183,7 +203,7 @@ void setup() {
 
 double output_motor = 0;
 void loop() {
-    Input = raDistance.getAverage(); // Read the distance from the sensor
+    Input = kalmanFilter.update(raDistance.getAverage()); // Read the distance from the sensor
     bldcPID.Compute(); // Compute the output
 
     // Convert the output to the ESC to a value between 0 and 255
