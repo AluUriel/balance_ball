@@ -9,15 +9,15 @@
 
 
 // Define the min and max output values for the ESC
-#define MIN_ESC_OUTPUT 1300
-#define MAX_ESC_OUTPUT 1500
+#define MIN_ESC_OUTPUT 1100
+#define MAX_ESC_OUTPUT 1600
 
 const double MAX_PID_OUTPUT = 100;
 const double MIN_PID_OUTPUT = -100;
 
 // Define PID constants
 double Kp = 2.0, Ki = 1, Kd = 0.2;
-double sampleTimePID = 25; // Tiempo de muestreo en milisegundos
+double sampleTimePID = 10; // Tiempo de muestreo en milisegundos
 
 // Define Input, Output, and Setpoint variables
 double Setpoint = 0, Input = 0, Output = 0;
@@ -47,7 +47,7 @@ ESC motorESC (escPin, 1000, 2000, 500); // ESC_Name (PIN, Minimum Value, Maximum
 // Crea objetos RunningAverage
 RunningAverage raInfrarrojo(10); // Ajusta el tamaño según tus necesidades
 RunningAverage raUltrasonico(10);
-RunningAverage raDistance(25);
+RunningAverage raDistance(20);
 
 double leerDistanciaInfrarrojo();
 double leerDistanciaUltrasonico();
