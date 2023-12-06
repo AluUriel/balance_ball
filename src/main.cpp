@@ -16,7 +16,7 @@ KalmanFilter kalmanFilter(0.0054, 0.1873);
 #define MAX_ESC_OUTPUT 1600
 
 const double MAX_PID_OUTPUT = 100;
-const double MIN_PID_OUTPUT = -100;
+const double MIN_PID_OUTPUT = 0;
 
 // Define PID constants
 double Kp = 2.0, Ki = 1, Kd = 0.2;
