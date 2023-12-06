@@ -61,6 +61,8 @@ void emit_data(void *parameter);
 HardwareSerialAdapter serialAdapter;
 CommunicationHandler serialHandler(serialAdapter);
 
+std::vector<String> split(const String& str, char delimiter);
+
 void setSetpoint(String payload) {
     Setpoint = payload.toDouble();
 
